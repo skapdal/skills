@@ -1,0 +1,9 @@
+{
+  "name": "skapdal-skills",
+  "version": "0.1.0",
+  "description": "Skills compartidas del equipo de skapdal para Claude — procesos estandarizados y reproducibles (auditorías, propuestas, y las que se sumen a futuro).",
+  "author": {
+    "name": "skapdal"
+  },
+  "repository": "https://github.com/skapdal/skills"
+}
