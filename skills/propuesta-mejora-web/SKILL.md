@@ -311,9 +311,10 @@ Qué lleva, además del mismo contenido y sistema de diseño de la sección 8:
 
 Cada vez que el informe tiene un link gateado (sección 9), generar también un archivo de texto plano `whatsapp-<cliente>.txt` con el mensaje listo para copiar y pegar. Contenido:
 
-- **Mensaje 1**: saludo, qué es el informe, el link (`https://.../<cliente>/`, sin el token en la URL), y si existe un link a Figma en la "Dirección de diseño propuesta" del informe, mencionarlo acá con una frase corta (no repetir el contenido, solo avisar que está y dónde encontrarlo dentro del informe).
+- **Mensaje 1**: saludo **por el nombre de la persona de contacto** (no el de la empresa — pedirlo si no se tiene), qué es el informe, el link (`https://.../<cliente>/`, sin el token en la URL), y si existe un link a Figma en la "Dirección de diseño propuesta" del informe, mencionarlo con una frase corta (no repetir el contenido, solo avisar que está y dónde encontrarlo dentro del informe) — agregando siempre la aclaración de que Figma es una plataforma externa: hay que loguearse con el mail para que aprueben el acceso, y que el archivo es estático (estos dos puntos evitan que el cliente se confunda o abandone al pedirle Figma un login inesperado).
 - **Mensaje 2**, separado: el token y su fecha de vencimiento. Indicar en el archivo (como nota, no como parte del mensaje al cliente) que conviene mandar los dos mensajes por separado — más todavía si el informe documenta algo sensible — para que un solo mensaje reenviado o filtrado no alcance para ver el contenido.
 - Si no hay referencia a Figma en ese informe, omitir esa línea sin dejar un placeholder vacío.
+- Después de enviar los mensajes reales, actualizar el archivo con la hora de envío real y guardar el texto tal cual se mandó (no solo la plantilla) — sirve de registro por si hay que retomar la conversación o renovar el token más adelante.
 
 **Este archivo nunca se comitea** — tiene el token en texto plano a propósito (es lo que lo hace útil para copiar/pegar), lo cual choca directo con la regla de "nunca texto plano en el repo" del resto de esta skill. Agregar siempre `whatsapp-*.txt` al `.gitignore` del repo de entregables antes de generarlo, si ese `.gitignore` no lo tiene ya.
 
