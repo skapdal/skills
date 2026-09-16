@@ -46,8 +46,9 @@ Si el cliente pidió una dirección de diseño concreta (minimalismo, un patrón
 Siempre en este formato, ordenada de mayor a menor prioridad:
 
 | Prioridad | Hallazgo | Recomendación | Esfuerzo est. |
+|---|---|---|---|
 
- Reglas de prioridad:
+Reglas de prioridad:
 - **Alta**: todo lo de seguridad (sin excepción), y cualquier cosa que bloquee o confunda al usuario en el flujo principal (popup que traba el scroll, navegación rota).
 - **Media**: inconsistencias visuales o de contenido que no bloquean pero sí restan profesionalismo.
 - **Baja**: oportunidades de optimización sin fricción asociada (jerarquía de producto, mejoras incrementales).
@@ -85,7 +86,7 @@ const CONFIG = {
   clienteNombre: "Nombre del cliente",
   dominio: "ejemplo.com",
   preparadoPor: "Adrian Freisinger",
-  contacto: "afreisinger@gmail.com",
+  contacto: "afreisinger@skapdal.com",
   fecha: "Mes 2026",
   archivoSalida: "propuesta-mejora-<cliente>.docx",
 };
@@ -137,15 +138,15 @@ const queFunciona = ["...", "..."];
 const proximosPasos = ["...", "..."];
 // ============ FIN CONFIG ============
 
-const DARK = "2E3B2E", ACCENT = "4C6B4F", TEXT = "2B2B2B", MUTED = "6B6B6B";
-const RED = "B3413A", AMBER = "B8862B", GREEN = "3F7D4C", FONT = "Calibri";
+const DARK = "172033", ACCENT = "4F46E5", TEXT = "334155", MUTED = "64748B";
+const RED = "DC2626", AMBER = "D97706", GREEN = "0D9488", FONT = "Calibri";
 
 const h1 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 360, after: 160 },
   border: { bottom: { color: ACCENT, space: 4, style: BorderStyle.SINGLE, size: 6 } },
   children: [new TextRun({ text, bold: true, color: DARK, size: 30, font: FONT })] });
 const h2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 280, after: 120 },
   children: [new TextRun({ text, bold: true, color: ACCENT, size: 24, font: FONT })] });
-const body = (text) => new Paragraph({ spacing: { after: 160, line: 276 },
+const body = (text) => new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { after: 160, line: 276 },
   children: [new TextRun({ text, color: TEXT, size: 21, font: FONT })] });
 const bullet = (text) => new Paragraph({ numbering: { reference: "bullets", level: 0 }, spacing: { after: 90, line: 276 },
   children: [new TextRun({ text, color: TEXT, size: 21, font: FONT })] });
@@ -153,9 +154,9 @@ const priorityColor = (l) => ({ Alta: RED, Media: AMBER, Baja: GREEN }[l] || MUT
 
 function callout(titulo, lineas) {
   return new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [9000], rows: [new TableRow({ children: [
-    new TableCell({ width: { size: 9000, type: WidthType.DXA }, shading: { fill: "FBEEEC", type: ShadingType.CLEAR, color: "auto" },
+    new TableCell({ width: { size: 9000, type: WidthType.DXA }, shading: { fill: "FEF2F2", type: ShadingType.CLEAR, color: "auto" },
       borders: { top: { style: BorderStyle.SINGLE, size: 4, color: RED }, bottom: { style: BorderStyle.SINGLE, size: 4, color: RED },
-        left: { style: BorderStyle.SINGLE, size: 16, color: RED }, right: { style: BorderStyle.SINGLE, size: 4, color: "FBEEEC" } },
+        left: { style: BorderStyle.SINGLE, size: 16, color: RED }, right: { style: BorderStyle.SINGLE, size: 4, color: "FEF2F2" } },
       margins: { top: 160, bottom: 160, left: 220, right: 220 },
       children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: titulo, bold: true, color: RED, size: 20, font: FONT })] }),
         ...lineas.map((t) => new Paragraph({ numbering: { reference: "bullets", level: 0 }, spacing: { after: 60, line: 264 },
@@ -167,16 +168,16 @@ function recTable(rows) {
     new TableCell({ shading: { fill: DARK, type: ShadingType.CLEAR, color: "auto" }, verticalAlign: VerticalAlign.CENTER,
       margins: { top: 100, bottom: 100, left: 120, right: 120 },
       children: [new Paragraph({ children: [new TextRun({ text: t, bold: true, color: "FFFFFF", size: 18, font: FONT })] })] }));
-  const widths = [1300, 3600, 4600, 1500];
+  const widths = [1100, 3050, 3900, 1250]; // suma 9300 DXA: cabe en el ancho útil de A4 (11906 - 2*1300 de margen = 9306)
   const dataRows = rows.map((r, i) => {
-    const fill = i % 2 === 0 ? "FFFFFF" : "F5F7F4";
-    const cell = (text, color = TEXT, bold = false, valign = false) => new TableCell({
-      width: { size: widths[0], type: WidthType.DXA }, shading: { fill, type: ShadingType.CLEAR, color: "auto" },
+    const fill = i % 2 === 0 ? "FFFFFF" : "F8FAFC";
+    const cell = (text, colIndex, color = TEXT, bold = false, valign = false) => new TableCell({
+      width: { size: widths[colIndex], type: WidthType.DXA }, shading: { fill, type: ShadingType.CLEAR, color: "auto" },
       verticalAlign: valign ? VerticalAlign.CENTER : undefined, margins: { top: 100, bottom: 100, left: 120, right: 120 },
       children: [new Paragraph({ children: [new TextRun({ text, bold, color, size: 19, font: FONT })] })] });
     return new TableRow({ children: [
-      cell(r.priority, priorityColor(r.priority), true, true),
-      cell(r.finding), cell(r.recommendation), cell(r.effort, MUTED, false, true),
+      cell(r.priority, 0, priorityColor(r.priority), true, true),
+      cell(r.finding, 1), cell(r.recommendation, 2), cell(r.effort, 3, MUTED, false, true),
     ] });
   });
   return new Table({ width: { size: widths.reduce((a,b)=>a+b,0), type: WidthType.DXA }, columnWidths: widths,
@@ -205,7 +206,7 @@ bodyChildren.push(
   recTable(recomendaciones), body(""),
   h1("Qué funciona bien y conviene conservar"), ...queFunciona.map(bullet), body(""),
   h1("Próximos pasos sugeridos"), ...proximosPasos.map(bullet), body(""),
-  new Paragraph({ spacing: { before: 300 }, border: { top: { color: "D9DED7", space: 8, style: BorderStyle.SINGLE, size: 4 } },
+  new Paragraph({ spacing: { before: 300 }, border: { top: { color: "E2E8F0", space: 8, style: BorderStyle.SINGLE, size: 4 } },
     children: [new TextRun({ text: `Documento preparado por ${CONFIG.preparadoPor} (${CONFIG.contacto}) a partir de un relevamiento de diseño de ${CONFIG.dominio}.`,
       italics: true, color: MUTED, size: 18, font: FONT })] }),
 );
@@ -231,7 +232,7 @@ const doc = new Document({
       ] },
     { properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1300, bottom: 1300, left: 1300, right: 1300 } } },
       headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT,
-        border: { bottom: { color: "D9DED7", space: 4, style: BorderStyle.SINGLE, size: 4 } },
+        border: { bottom: { color: "E2E8F0", space: 4, style: BorderStyle.SINGLE, size: 4 } },
         children: [new TextRun({ text: `${CONFIG.clienteNombre} — Propuesta de mejora de diseño`, color: MUTED, size: 16, font: FONT })] })] }) },
       footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [
         new TextRun({ children: [PageNumber.CURRENT], color: MUTED, size: 16, font: FONT }),
@@ -271,15 +272,19 @@ Reglas:
 
 - Antes de escribir el HTML, chequear con `Artifact` (list_types) si hay un tipo de artifact tipo "Docs"/reporte disponible; si no hay uno que calce, construir la página a mano como HTML autocontenido y publicarla con `Artifact`, siguiendo el contrato de la skill `artifact-design` (sin `<!DOCTYPE>/<html>/<head>/<body>` propios, CDN solo de la allowlist, tokens de tema con soporte claro/oscuro, responsive hasta ~400px).
 - **Contenido**: exactamente el mismo texto y los mismos hallazgos que el .docx/.md — nunca inventar ni resumir de más para "llenar" la versión visual.
-- **Sistema de diseño (mantener consistencia entre proyectos, pero adaptar paleta de acento a la identidad del cliente cuando sea evidente)**:
-  - Colores semánticos fijos, iguales a los del .docx: prioridad Alta/hallazgo de seguridad en rojo (`#B3413A` o similar), Media en ámbar (`#B8862B`), Baja en verde (`#3F7D4C`).
-  - Tipografía: una serif editorial para títulos (p. ej. Fraunces) + sans para texto de cuerpo (p. ej. Inter) + monoespaciada para metadatos/labels (p. ej. JetBrains Mono), cargadas desde Google Fonts.
+- **Sistema de diseño (mantener consistencia entre proyectos; el acento de marca por default es el de skapdal, no el del cliente — adaptarlo a la identidad del cliente solo si el usuario lo pide explícitamente, como pasó una vez con un verde de marca)**:
+  - **Acento de marca (default, tomado de `tailwind.config.js` de skapdal.com)**: indigo `#6366F1` (`--accent`) / `#4F46E5` (`--accent-strong`, más oscuro para texto/links con contraste) / `#EEF2FF` (`--accent-soft`). Fondo y texto neutros en la escala slate de ese mismo config: `--paper` `#FAFBFC`, `--paper-raised` `#FFFFFF`, `--ink` `#172033`, `--ink-soft` `#64748B`, `--line` `#E2E8F0`. Dark mode: `--paper` `#111827`, `--paper-raised` `#1E293B`, `--ink` `#F1F5F9`, `--ink-soft` `#94A3B8`, `--accent-strong` `#A5B4FC`, `--line` `#273449`.
+  - Colores semánticos fijos (no son de marca, no cambian aunque cambie el acento): prioridad Alta/hallazgo de seguridad en rojo `#DC2626` (soft `#FEF2F2`; dark `#F87171`/`#450A0A`), Media en ámbar `#D97706` (soft `#FEF3C7`; dark `#FBBF24`/`#451A03`), Baja en teal `#0D9488` (soft `#CCFBF1`; dark `#2DD4BF`/`#083344`).
+  - Tipografía: monoespaciada (**JetBrains Mono**) para títulos, eyebrow y metadatos/labels — le da el tono técnico/editorial al informe — + sans (p. ej. Inter) para texto de cuerpo largo (diagnóstico, párrafos), para no cansar la lectura en bloques largos. Ambas cargadas desde Google Fonts.
   - Tokens de color en `:root` para modo claro, redefinidos bajo `prefers-color-scheme: dark` y `[data-theme]`, con fondo (`--paper`), texto (`--ink`), acento de marca, y variantes "soft" de cada color semántico para fondos de badges/callouts.
+  - Si el usuario pide adaptar el acento a la identidad del cliente, cambiar solo `--accent`/`--accent-strong`/`--accent-soft` (y el `ACCENT`/`DARK` del script del .docx) — nunca los tres colores semánticos de prioridad, que tienen que seguir leyéndose como Alta/Media/Baja sin importar la marca.
 - **Layout estándar** (adaptar, no es obligatorio calcarlo exacto):
   - Nav lateral tipo tabla de contenidos, sticky, con los mismos anclas que las secciones del documento.
   - Hero: eyebrow ("Propuesta de mejora"), título, subtítulo, fila de metadatos (dominio, fecha, preparado por) y una fila de stats rápidos (ej. cantidad de hallazgos por prioridad).
   - Una sección por cada parte del documento (resumen, alcance, diagnóstico con una tarjeta por eje, dirección de diseño si aplica, recomendaciones como tabla con badges de prioridad tipo "pill", qué funciona bien, próximos pasos numerados).
   - Los hallazgos de seguridad del eje 5 van destacados como callouts (mismo tratamiento visual que en el .docx: borde/fondo en rojo).
+  - **Gotcha del nav lateral + contenido como grid** (`grid-template-columns: 220px minmax(0,1fr)`, colapsando a `1fr` en mobile): los hijos directos de ese grid (`nav` y `main`) tienen `min-width:auto` por default, no `0`. Si algo dentro de `main` no se achica (una fila `flex` de metadatos/stats, por ejemplo), el tramo `1fr` crece más ancho que el viewport y corta todo a la derecha en mobile en vez de wrappear. Agregar siempre `.layout > *{ min-width:0; }` (o el selector que corresponda a los hijos directos del grid).
+  - **Gotcha del centrado**: el ancho máximo (`max-width:1180px`) y el padding que centra el contenido (`padding-inline: max(16px, calc((100% - 1180px)/2))`) van **juntos en un solo lugar, sobre `body`** — nunca repetir esa fórmula de padding en `.layout` (u otro hijo) además de darle su propio `max-width`, porque con `box-sizing:border-box` el padding se calcula sobre ese `max-width` más chico y termina comiéndose casi todo el ancho: en pantallas anchas queda una columna angosta tipo mobile aunque haya espacio de sobra.
 - Publicar con `Artifact`: `title` corto ("Propuesta {Cliente}"), `description` de una oración, `favicon` un emoji acorde al rubro del cliente, `icon: "report"`.
 - El artifact queda privado por default — no compartir el link ni asumir que el cliente ya lo puede ver; el usuario decide cuándo compartirlo.
 
@@ -295,6 +300,8 @@ Qué lleva, además del mismo contenido y sistema de diseño de la sección 8:
   - Persistir el desbloqueo en `sessionStorage` para no pedir el token de nuevo en la misma sesión de navegación.
   - Soportar un link directo con `?token=TU-TOKEN` en la URL, que valida solo y después limpia el parámetro de la barra de direcciones con `history.replaceState` (para que no quede visible ni se comparta por accidente al reenviar el link).
   - Dejar, como comentario HTML visible en el código fuente, las instrucciones para regenerar `ACCESS_HASH` a partir de un token nuevo (con el mismo snippet de `crypto.subtle.digest` corrido en la consola del navegador), y un token de ejemplo claramente marcado como "cambiar antes de publicar".
+  - **Gotcha de CSS**: si el gate se esconde con `elemento.hidden = true`, agregar siempre una regla explícita `[hidden]{display:none!important;}` en el `<style>`. Sin esa regla, cualquier selector de autor con la misma o mayor especificidad (`#gate{display:flex}`, `.layout{display:grid}`, etc.) le gana al comportamiento default del navegador para `[hidden]` — el atributo queda puesto pero el elemento sigue visible, y el gate no desaparece aunque el token sea correcto.
+  - Opcional pero recomendable: agregar vigencia (`ACCESS_EXPIRES`, una fecha ISO) además del hash — si `Date.now()` la supera, mostrar un estado de "enlace vencido" en vez del contenido, sin validar el token.
 - Nombre de archivo: `propuesta-<cliente>-standalone.html`, entregado como archivo aparte del `.docx`/`.md`/artifact (no reemplaza a ninguno).
 
 **Caveat obligatorio — decirlo siempre, en el código (comentario) y en el mensaje al usuario, no asumir que ya lo sabe**: este gate es una cortesía de acceso, no seguridad real. El contenido completo viaja igual dentro del HTML; cualquiera con conocimientos técnicos puede verlo con "Ver código fuente" o las herramientas de desarrollador del navegador, sin necesitar el token. Es útil para que un link no se abra a cualquiera que lo encuentre por casualidad, pero no protege contra alguien que busque específicamente el contenido. Si el informe documenta una vulnerabilidad real del cliente (como suele pasar con el eje de seguridad de este mismo proceso), recomendar explícitamente reforzarlo con control de acceso real del lado del servidor antes de publicarlo: HTTP Basic Auth, una regla de reverse proxy, o un link firmado con expiración — el gate client-side es un complemento, no un reemplazo.
