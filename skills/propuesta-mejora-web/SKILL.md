@@ -307,11 +307,22 @@ Qué lleva, además del mismo contenido y sistema de diseño de la sección 8:
 
 **Caveat obligatorio — decirlo siempre, en el código (comentario) y en el mensaje al usuario, no asumir que ya lo sabe**: este gate es una cortesía de acceso, no seguridad real. El contenido completo viaja igual dentro del HTML; cualquiera con conocimientos técnicos puede verlo con "Ver código fuente" o las herramientas de desarrollador del navegador, sin necesitar el token. Es útil para que un link no se abra a cualquiera que lo encuentre por casualidad, pero no protege contra alguien que busque específicamente el contenido. Si el informe documenta una vulnerabilidad real del cliente (como suele pasar con el eje de seguridad de este mismo proceso), recomendar explícitamente reforzarlo con control de acceso real del lado del servidor antes de publicarlo: HTTP Basic Auth, una regla de reverse proxy, o un link firmado con expiración — el gate client-side es un complemento, no un reemplazo.
 
+### Mensaje de comunicación al cliente (WhatsApp)
+
+Cada vez que el informe tiene un link gateado (sección 9), generar también un archivo de texto plano `whatsapp-<cliente>.txt` con el mensaje listo para copiar y pegar. Contenido:
+
+- **Mensaje 1**: saludo, qué es el informe, el link (`https://.../<cliente>/`, sin el token en la URL), y si existe un link a Figma en la "Dirección de diseño propuesta" del informe, mencionarlo acá con una frase corta (no repetir el contenido, solo avisar que está y dónde encontrarlo dentro del informe).
+- **Mensaje 2**, separado: el token y su fecha de vencimiento. Indicar en el archivo (como nota, no como parte del mensaje al cliente) que conviene mandar los dos mensajes por separado — más todavía si el informe documenta algo sensible — para que un solo mensaje reenviado o filtrado no alcance para ver el contenido.
+- Si no hay referencia a Figma en ese informe, omitir esa línea sin dejar un placeholder vacío.
+
+**Este archivo nunca se comitea** — tiene el token en texto plano a propósito (es lo que lo hace útil para copiar/pegar), lo cual choca directo con la regla de "nunca texto plano en el repo" del resto de esta skill. Agregar siempre `whatsapp-*.txt` al `.gitignore` del repo de entregables antes de generarlo, si ese `.gitignore` no lo tiene ya.
+
 ## 10. Entrega
 
 - El `.docx` es el entregable base, siempre.
 - El `.md` se genera si lo piden.
 - El informe visual (Artifact, sección 8) se ofrece como estándar — no hace falta que lo pidan con esas palabras; alcanza con que el contexto sea "para mostrarle al cliente en pantalla" o pidan algo "más atractivo/visual".
 - La versión autohospedable con gate (sección 9) solo se genera si el usuario específicamente quiere bajarlo o publicarlo fuera de Claude con algún control de acceso — no generarla de forma proactiva, porque implica que el usuario tiene que mantener el token/hash y el hosting por su cuenta.
+- Si se generó el gate, generar también el `whatsapp-<cliente>.txt` (ver sección 9) — no se comitea, solo se entrega.
 
 Copiar cada archivo final a `/mnt/user-data/outputs/` y entregarlo con `SendUserFile`. No hace falta narrar los pasos del proceso al usuario — el resumen final alcanza con qué se encontró (1–2 líneas), qué formatos se entregaron, y el/los archivo(s).
