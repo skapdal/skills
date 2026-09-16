@@ -1,11 +1,11 @@
 ---
 name: propuesta-mejora-web
-description: Usar cuando pidan auditar el diseño/UX de un sitio web y producir una "propuesta de mejora" para presentar a un cliente — estandariza tanto el relevamiento (qué revisar y cómo verificarlo) como el documento final (estructura, tono, tabla de prioridades). Disparadores: "análisis de diseño de una página", "auditoría UX", "propuesta de mejora para el cliente", "revisá el diseño de este sitio".
+description: "Genera una auditoría de diseño/UX de un sitio web y la entrega como documento de propuesta de mejora listo para presentar a un cliente (Word, Markdown, informe visual tipo Artifact y, si hace falta, versión autohospedable con gate de acceso)."
 ---
 
 # Propuesta de mejora de diseño web
 
-Estandariza dos cosas a la vez: **qué se revisa** de un sitio (siempre los mismos 5 ejes, más un eje de dirección estratégica cuando aplica) y **cómo se entrega** (mismo documento, misma tabla de prioridades, mismo tono). El objetivo es que dos auditorías hechas en momentos distintos se sientan del mismo estudio, y que el cliente reciba algo accionable, no una lista de opiniones sueltas.
+Estandariza dos cosas a la vez: **qué se revisa** de un sitio (siempre los mismos 5 ejes, más un eje de dirección estratégica cuando aplica) y **cómo se entrega** (mismo documento, misma tabla de prioridades, mismo tono, y los mismos formatos de salida). El objetivo es que dos auditorías hechas en momentos distintos se sientan del mismo estudio, y que el cliente reciba algo accionable, no una lista de opiniones sueltas.
 
 ## 0. Alcance y honestidad de los hallazgos
 
@@ -65,6 +65,8 @@ Esfuerzo: Bajo / Medio / Medio-Alto / Alto — estimación gruesa, no un presupu
 7. Qué funciona bien y conviene conservar (bullets — nunca omitir, todo sitio tiene algo rescatable y humaniza el informe).
 8. Próximos pasos sugeridos (bullets accionables, orden lógico: primero lo urgente/bajo esfuerzo).
 9. Pie de página con autoría.
+
+Esta misma estructura y contenido es la que se traduce, sin agregar ni inventar nada nuevo, a los demás formatos de salida (Markdown, informe visual, versión autohospedable) descriptos más abajo.
 
 ## 5. Generar el .docx
 
@@ -246,7 +248,7 @@ Notas sobre el script:
 - No forzar `PageBreak` manual antes de secciones largas (como la tabla) — deja páginas en blanco cuando el contenido previo ya cae justo al borde. Dejar que fluya solo.
 - El callout rojo es solo para hallazgos de seguridad — no reusar ese color para otra cosa, así el cliente lo reconoce de un vistazo como "esto es urgente".
 
-## 6. Verificar antes de entregar
+## 6. Verificar antes de entregar el .docx
 
 Siempre, sin excepción:
 
@@ -261,6 +263,47 @@ Leer **todas** las páginas generadas (`Read` sobre cada `page-N.jpg`) antes de 
 
 Misma estructura y mismo contenido, en `.md` plano: `#`/`##` para los títulos, tabla Markdown para las recomendaciones (usar 🔴/🟡/🟢 antes de Alta/Media/Baja para que la prioridad se distinga a simple vista), `>` para los callouts de seguridad con **⚠** al inicio de la primera línea.
 
-## 8. Entrega
+## 8. Informe visual (Artifact) — ofrecer siempre como opción estándar
 
-Copiar el archivo final a `/mnt/user-data/outputs/` y entregarlo con `SendUserFile`. No hace falta narrar los pasos del proceso al usuario — el resumen final alcanza con qué se encontró (1–2 líneas) y el archivo.
+Además del .docx (y el .md si lo piden), ofrecer un informe visual interactivo publicado como Artifact — es el formato que mejor funciona para que el cliente lo mire en pantalla (desktop o mobile) antes de una reunión, y es lo que corresponde cuando piden algo "más atractivo", "tipo Gemini" o simplemente "un informe visual". No reemplaza al .docx (que sigue siendo el entregable formal/imprimible) — es un tercer formato del mismo contenido, nunca contenido nuevo.
+
+Reglas:
+
+- Antes de escribir el HTML, chequear con `Artifact` (list_types) si hay un tipo de artifact tipo "Docs"/reporte disponible; si no hay uno que calce, construir la página a mano como HTML autocontenido y publicarla con `Artifact`, siguiendo el contrato de la skill `artifact-design` (sin `<!DOCTYPE>/<html>/<head>/<body>` propios, CDN solo de la allowlist, tokens de tema con soporte claro/oscuro, responsive hasta ~400px).
+- **Contenido**: exactamente el mismo texto y los mismos hallazgos que el .docx/.md — nunca inventar ni resumir de más para "llenar" la versión visual.
+- **Sistema de diseño (mantener consistencia entre proyectos, pero adaptar paleta de acento a la identidad del cliente cuando sea evidente)**:
+  - Colores semánticos fijos, iguales a los del .docx: prioridad Alta/hallazgo de seguridad en rojo (`#B3413A` o similar), Media en ámbar (`#B8862B`), Baja en verde (`#3F7D4C`).
+  - Tipografía: una serif editorial para títulos (p. ej. Fraunces) + sans para texto de cuerpo (p. ej. Inter) + monoespaciada para metadatos/labels (p. ej. JetBrains Mono), cargadas desde Google Fonts.
+  - Tokens de color en `:root` para modo claro, redefinidos bajo `prefers-color-scheme: dark` y `[data-theme]`, con fondo (`--paper`), texto (`--ink`), acento de marca, y variantes "soft" de cada color semántico para fondos de badges/callouts.
+- **Layout estándar** (adaptar, no es obligatorio calcarlo exacto):
+  - Nav lateral tipo tabla de contenidos, sticky, con los mismos anclas que las secciones del documento.
+  - Hero: eyebrow ("Propuesta de mejora"), título, subtítulo, fila de metadatos (dominio, fecha, preparado por) y una fila de stats rápidos (ej. cantidad de hallazgos por prioridad).
+  - Una sección por cada parte del documento (resumen, alcance, diagnóstico con una tarjeta por eje, dirección de diseño si aplica, recomendaciones como tabla con badges de prioridad tipo "pill", qué funciona bien, próximos pasos numerados).
+  - Los hallazgos de seguridad del eje 5 van destacados como callouts (mismo tratamiento visual que en el .docx: borde/fondo en rojo).
+- Publicar con `Artifact`: `title` corto ("Propuesta {Cliente}"), `description` de una oración, `favicon` un emoji acorde al rubro del cliente, `icon: "report"`.
+- El artifact queda privado por default — no compartir el link ni asumir que el cliente ya lo puede ver; el usuario decide cuándo compartirlo.
+
+## 9. Versión autohospedable con gate de acceso (solo si el usuario quiere alojarlo fuera de Claude)
+
+Cuando el usuario pide poder bajar el informe visual o publicarlo en su propio dominio con algún control de acceso para el cliente (token, contraseña), generar un **segundo archivo HTML**, distinto del publicado como Artifact: un documento completo y autocontenido (`<!doctype html><html>...</html>` propio, no el esqueleto que inyecta el Artifact tool) que el usuario pueda subir a su propio hosting.
+
+Qué lleva, además del mismo contenido y sistema de diseño de la sección 8:
+
+- `<meta name="robots" content="noindex, nofollow">` para que no lo indexen buscadores.
+- Un gate de acceso simple, client-side, antes de mostrar el contenido:
+  - Hashear el token de acceso con `crypto.subtle.digest('SHA-256', ...)` y comparar contra un hash guardado en el HTML (`ACCESS_HASH`) — nunca guardar el token en texto plano en el archivo.
+  - Persistir el desbloqueo en `sessionStorage` para no pedir el token de nuevo en la misma sesión de navegación.
+  - Soportar un link directo con `?token=TU-TOKEN` en la URL, que valida solo y después limpia el parámetro de la barra de direcciones con `history.replaceState` (para que no quede visible ni se comparta por accidente al reenviar el link).
+  - Dejar, como comentario HTML visible en el código fuente, las instrucciones para regenerar `ACCESS_HASH` a partir de un token nuevo (con el mismo snippet de `crypto.subtle.digest` corrido en la consola del navegador), y un token de ejemplo claramente marcado como "cambiar antes de publicar".
+- Nombre de archivo: `propuesta-<cliente>-standalone.html`, entregado como archivo aparte del `.docx`/`.md`/artifact (no reemplaza a ninguno).
+
+**Caveat obligatorio — decirlo siempre, en el código (comentario) y en el mensaje al usuario, no asumir que ya lo sabe**: este gate es una cortesía de acceso, no seguridad real. El contenido completo viaja igual dentro del HTML; cualquiera con conocimientos técnicos puede verlo con "Ver código fuente" o las herramientas de desarrollador del navegador, sin necesitar el token. Es útil para que un link no se abra a cualquiera que lo encuentre por casualidad, pero no protege contra alguien que busque específicamente el contenido. Si el informe documenta una vulnerabilidad real del cliente (como suele pasar con el eje de seguridad de este mismo proceso), recomendar explícitamente reforzarlo con control de acceso real del lado del servidor antes de publicarlo: HTTP Basic Auth, una regla de reverse proxy, o un link firmado con expiración — el gate client-side es un complemento, no un reemplazo.
+
+## 10. Entrega
+
+- El `.docx` es el entregable base, siempre.
+- El `.md` se genera si lo piden.
+- El informe visual (Artifact, sección 8) se ofrece como estándar — no hace falta que lo pidan con esas palabras; alcanza con que el contexto sea "para mostrarle al cliente en pantalla" o pidan algo "más atractivo/visual".
+- La versión autohospedable con gate (sección 9) solo se genera si el usuario específicamente quiere bajarlo o publicarlo fuera de Claude con algún control de acceso — no generarla de forma proactiva, porque implica que el usuario tiene que mantener el token/hash y el hosting por su cuenta.
+
+Copiar cada archivo final a `/mnt/user-data/outputs/` y entregarlo con `SendUserFile`. No hace falta narrar los pasos del proceso al usuario — el resumen final alcanza con qué se encontró (1–2 líneas), qué formatos se entregaron, y el/los archivo(s).
